@@ -20,7 +20,7 @@ namespace Task.Windows.Forms.Helper
 
         public UrlConfigSingleton()
         {
-            this.Url = ConfigurationManager.AppSettings["AppUrl"];
+            this.Url = ConfigurationManager.AppSettings["LocalHostWebApiUrl"];
         }
 
         public string Url { get; set; }
