@@ -14,15 +14,19 @@ namespace Task.Web.Api.Controllers
     [RoutePrefix("api")]
     public class EmployeeController : ApiController
     {
-        private readonly IEmployeeBusinessLayer _employeeBusinessLayer = new EmployeeBusinessLayer();
+
+        private readonly IEmployeeBusinessLayer _employeeBusinessLayer;
+
+        public EmployeeController(IEmployeeBusinessLayer employeeBusinessLayer)
+        {
+            _employeeBusinessLayer = employeeBusinessLayer;
+        }
 
         [HttpGet]
         [Route("employee/get")]
         public async Task<IHttpActionResult> GetAll()
         {
-            if (ModelState.IsValid == false)
-                return BadRequest(ModelState);
-
+            this.ModelState.Clear();
             try
             {
                 var result = await _employeeBusinessLayer.GetAllEmployee();
@@ -86,13 +90,12 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-
-                    var affectedRow = await _employeeBusinessLayer.InsertEmployee(employee);
-                    return Ok(new BasicResponse()
-                    {
-                        Status = true,
-                        Message = "AddEmployee",
-                    });
+                var affectedRow = await _employeeBusinessLayer.InsertEmployee(employee);
+                return Ok(new BasicResponse()
+                {
+                    Status = true,
+                    Message = "AddEmployee",
+                });
             }
             catch (Exception e)
             {
@@ -115,7 +118,6 @@ namespace Task.Web.Api.Controllers
             {
                 this.ModelState.Clear();
                 int affectedRow = await _employeeBusinessLayer.UpdateEmployee(id,employee);
-
                 return Ok(new BasicResponse()
                 {
                     Status = true,

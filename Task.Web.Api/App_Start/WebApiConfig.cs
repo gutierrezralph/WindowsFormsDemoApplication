@@ -4,6 +4,10 @@ using Task.Web.Api.Infrastructure.Filter;
 using Microsoft.AspNet.WebApi.Extensions.Compression.Server;
 using System.Net.Http.Extensions.Compression.Core.Compressors;
 using Task.Web.Api.Infrastructure.Handler;
+using Task.Web.Api.Module;
+using Ninject;
+using Task.BusinessLayer.Interface;
+using Task.BusinessLayer.Implementation;
 
 namespace Task.Web.Api
 {
@@ -29,6 +33,8 @@ namespace Task.Web.Api
             //Initialeze model valition provider
             FluentValidationModelValidatorProvider.Configure(config);
 
+            /// Initialize Kernel
+            InitializedKernelForNinject();
 
             // Web API routes
             config.MapHttpAttributeRoutes();
@@ -38,6 +44,15 @@ namespace Task.Web.Api
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+        }
+
+        /// <summary>
+        /// Initialize Kernel
+        /// </summary>
+        private static void InitializedKernelForNinject()
+        {
+            IKernel kernel = new StandardKernel();
+            kernel.Bind<IEmployeeBusinessLayer>().To<EmployeeBusinessLayer>();
         }
     }
 }
