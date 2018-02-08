@@ -14,12 +14,19 @@ namespace Task.Windows.Forms.Service
 {
     public class EmployeeService
     {
-        public static readonly UrlConfigSingleton Instance = new UrlConfigSingleton();
-        private static readonly HttpClient httpClient = new HttpClient();
+        public static readonly UrlConfigSingleton _instance = new UrlConfigSingleton();
 
-        public async Task<ResponseResult> GetAsync(string route)
+        /// <summary>
+        /// Creating request to API
+        /// </summary>
+        /// <param name="uriRoute">
+        /// URI route for employee
+        /// Ex: api/employee/get
+        /// </param>
+        /// <returns> All records from employee table </returns>
+        public async Task<ResponseResult> GetRequestAsync(string uriRoute)
         {
-            var requestURL = string.Concat(Instance.Url, route);
+            var requestURL = string.Concat(_instance.Url, uriRoute);
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestURL);
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 
@@ -34,22 +41,32 @@ namespace Task.Windows.Forms.Service
             }
         }
 
-        public async Task<EmployeeResponse> CreateServiceRequestAsync(string route, EmployeeRequest data, HttpRequestVerb method = HttpRequestVerb.POST)
+        /// <summary>
+        /// Creating request from API
+        /// </summary>
+        /// <param name="uriRoute">
+        /// URI route for employee
+        /// Ex: api/employee/Add
+        /// Ex: api/employee/Edit{id}
+        /// Ex: api/employee/Remove/{id}
+        /// </param>
+        /// <param name="employeeRequest"> Contains data informations that will be sent thru Api </param>
+        /// <param name="httpRequestMethod">Http request method</param>
+        /// <returns></returns>
+        public async Task<EmployeeResponse> CreateRequestAsync(string uriRoute, EmployeeRequest employeeRequest, HttpRequestVerbEnum httpRequestMethod = HttpRequestVerbEnum.Post)
         {
-            var requestURL = string.Concat(Instance.Url, route);
-            var serializedRequestData = JsonConvert.SerializeObject(data);
+            var requestURL = string.Concat(_instance.Url, uriRoute);
+            var serializedRequestData = JsonConvert.SerializeObject(employeeRequest);
             byte[] dataBytes = Encoding.UTF8.GetBytes(serializedRequestData);
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestURL);
             request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
             request.ContentLength = dataBytes.Length;
             request.ContentType = "application/json";
-            request.Method = method.ToString();
+            request.Method = httpRequestMethod.ToString();
 
             using (Stream requestBody = request.GetRequestStream())
-            {
                 await requestBody.WriteAsync(dataBytes, 0, dataBytes.Length);
-            }
 
             using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
             using (Stream stream = response.GetResponseStream())

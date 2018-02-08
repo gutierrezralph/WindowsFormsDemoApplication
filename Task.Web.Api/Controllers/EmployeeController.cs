@@ -14,7 +14,7 @@ namespace Task.Web.Api.Controllers
     [RoutePrefix("api")]
     public class EmployeeController : ApiController
     {
-        private readonly IEmployeeBusinessLayer empBL = new EmployeeBusinessLayer();
+        private readonly IEmployeeBusinessLayer _employeeBusinessLayer = new EmployeeBusinessLayer();
 
         [HttpGet]
         [Route("employee/get")]
@@ -25,7 +25,7 @@ namespace Task.Web.Api.Controllers
 
             try
             {
-                var result = await empBL.GetAllEmployee();
+                var result = await _employeeBusinessLayer.GetAllEmployee();
 
                 return Ok(new BasicResponse()
                 {
@@ -56,7 +56,7 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                var result = await empBL.GetEmployeeById(id);
+                var result = await _employeeBusinessLayer.GetEmployeeById(id);
                        
                 return Ok(new BasicResponse()
                 {
@@ -87,7 +87,7 @@ namespace Task.Web.Api.Controllers
             {
                 this.ModelState.Clear();
 
-                    var affectedRow = await empBL.InsertEmployee(employee);
+                    var affectedRow = await _employeeBusinessLayer.InsertEmployee(employee);
                     return Ok(new BasicResponse()
                     {
                         Status = true,
@@ -114,7 +114,7 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                int affectedRow = await empBL.UpdateEmployee(id,employee);
+                int affectedRow = await _employeeBusinessLayer.UpdateEmployee(id,employee);
 
                 return Ok(new BasicResponse()
                 {
@@ -143,7 +143,7 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                int affectedRow = await empBL.DeleteEmployee(id);
+                int affectedRow = await _employeeBusinessLayer.DeleteEmployee(id);
                 return Ok(new BasicResponse()
                 {
                     Status = true,
@@ -155,7 +155,7 @@ namespace Task.Web.Api.Controllers
                 return Ok(new BasicResponse()
                 {
                     Status = false,
-                    Message = "RemoveEmployee ERROR " + e.Message,
+                    Message = string.Format("RemoveEmployee ERROR {0}", e.Message),
                     Exception = e
                 });
             }

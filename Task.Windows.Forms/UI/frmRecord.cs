@@ -48,9 +48,7 @@ namespace Task.Windows.Forms.Forms
             try
             {
                 if (gridView.SelectedRowsCount > 0)
-                {
                     gridView.ShowEditForm();
-                }
             }
             catch (Exception x)
             {
@@ -64,14 +62,18 @@ namespace Task.Windows.Forms.Forms
             {
                 if (gridView.SelectedRowsCount > 0)
                 {
-                    if (XtraMessageBox.Show("Are you sure to delete selected record?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    var dialogResultIsYes = XtraMessageBox.Show("Selected record will be deleted?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes;
+                    if (dialogResultIsYes)
                     {
                         var selectedRecordForDeletion = GetRowSelectedData();
-                        if (selectedRecordForDeletion.Id == 0 || selectedRecordForDeletion == null) return;
-                        var record = new clsEmployeeRecord();
-                        record.ServiceRequestedData(
-                            string.Format("{0}/{1}", UrlRoute.REMOVE.ToString(), selectedRecordForDeletion.Id), selectedRecordForDeletion, HttpRequestVerb.DELETE
-                            );
+                        if (selectedRecordForDeletion.Id == 0 || selectedRecordForDeletion == null)
+                            return;
+
+                        var record = new EmployeeRecord();
+                        record.SendingRequestedData(
+                            string.Format("{0}/{1}", EmployeeUriEnum.Remove.ToString(), selectedRecordForDeletion.Id), 
+                            selectedRecordForDeletion, HttpRequestVerbEnum.Delete);
+
                         gridView.DeleteSelectedRows();
                     }
                 }
@@ -86,20 +88,17 @@ namespace Task.Windows.Forms.Forms
         {
             try
             {            
-                var IsCanel = EditFormCancelButtonWasClicked(sender);
-                if (IsCanel) return;
-                var data = GetRowSelectedData();
-                if(!string.IsNullOrWhiteSpace(data.FirstName) && !string.IsNullOrWhiteSpace(data.LastName))
-                {
-                    CreateRequest(data);
-                    gridView.CloseEditForm();
-                    RefreshDataGrid();
-                    XtraMessageBox.Show("Successfully saved.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
+                var isFromCanel = EditFormCancelButtonWasClicked(sender);
+                if (isFromCanel)
                     return;
-                }
+
+                var data = GetRowSelectedData();
+                if (string.IsNullOrWhiteSpace(data.FirstName) && string.IsNullOrWhiteSpace(data.LastName))
+                    return;
+
+                CreateRequest(data);
+                gridView.CloseEditForm();
+                RefreshDataGrid();
             }
             catch (Exception x)
             {
@@ -116,9 +115,9 @@ namespace Task.Windows.Forms.Forms
 
         private BindingList<ResponseData> GridDataSource()
         {
-            var record = new clsEmployeeRecord();
-            var data = record.GetEmployeeData();
-            return data;
+            var employeeRecord = new EmployeeRecord();
+            var employeeData = employeeRecord.GetEmployeeData();
+            return employeeData;
         }
 
         private void OnShowingPopupEditForm(object sender, DevExpress.XtraGrid.Views.Grid.ShowingPopupEditFormEventArgs e)
@@ -126,21 +125,16 @@ namespace Task.Windows.Forms.Forms
             foreach (Control control in e.EditForm.Controls)
             {
                 if (!(control is EditFormContainer))
-                {
                     continue;
-                }
                 foreach (Control nestedControl in control.Controls)
                 {
                     if (!(nestedControl is PanelControl))
-                    {
                         continue;
-                    }
                     foreach (Control button in nestedControl.Controls)
                     {
                         if (!(button is SimpleButton))
-                        {
                             continue;
-                        }
+
                         var updateBotton = button as SimpleButton;
                         updateBotton.Click -= OnClickEditFormUpdateButton;
                         updateBotton.Click += OnClickEditFormUpdateButton;
@@ -153,18 +147,18 @@ namespace Task.Windows.Forms.Forms
         {
             var buttonType = sender.GetType().Name;
             // Check if the sender is cancel button from editForm
-            var IsCanel = buttonType.Equals("EditFormCancelButton", StringComparison.CurrentCultureIgnoreCase);
-            return IsCanel;
+            var isCanel = buttonType.Equals("EditFormCancelButton", StringComparison.CurrentCultureIgnoreCase);
+            return isCanel;
         }
 
-        private void CreateRequest(ResponseData data)
+        private void CreateRequest(ResponseData responseData)
         {
-            var record = new clsEmployeeRecord();
+            var record = new EmployeeRecord();
 
-            if(data.Id == 0)
-                record.ServiceRequestedData(UrlRoute.ADD.ToString(), data, HttpRequestVerb.POST);
+            if(responseData.Id == 0)
+                record.SendingRequestedData(EmployeeUriEnum.Add.ToString(), responseData, HttpRequestVerbEnum.Post);
             else
-                 record.ServiceRequestedData(string.Format("{0}/{1}", UrlRoute.EDIT.ToString(), data.Id), data, HttpRequestVerb.PUT);
+                 record.SendingRequestedData(string.Format("{0}/{1}", EmployeeUriEnum.Edit.ToString(), responseData.Id), responseData, HttpRequestVerbEnum.Put);
         }
 
         private ResponseData GetRowSelectedData()
@@ -188,7 +182,7 @@ namespace Task.Windows.Forms.Forms
             if (!(inputValue.All(c => Char.IsLetter(c) || c == ' ')))
             {
                 e.ErrorText = "The text entered contains invalid character.";
-                e.Valid = false;                
+                e.Valid = false;
             }
 
             if (inputValue.Length > 50)

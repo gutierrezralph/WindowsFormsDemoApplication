@@ -62,10 +62,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\clsEmployeeRecord.cs" />
-    <Compile Include="Helper\HttpRequestVerb.cs" />
+    <Compile Include="Classes\EmployeeRecord.cs" />
+    <Compile Include="Helper\HttpRequestVerbEnum.cs" />
     <Compile Include="Helper\UrlConfigSingleton.cs" />
-    <Compile Include="Helper\UrlRoute.cs" />
+    <Compile Include="Helper\EmployeeUriEnum.cs" />
     <Compile Include="Mapper\AutoMapperConfig.cs" />
     <Compile Include="Mapper\MapProfile\RequestDataMapProfile.cs" />
     <Compile Include="Service\EmployeeService.cs" />

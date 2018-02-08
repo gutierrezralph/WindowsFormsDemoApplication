@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Task.Windows.Forms.Helper
 {
-    public enum UrlRoute
+    public enum EmployeeUriEnum
     {
-        GET,
-        REMOVE,
-        ADD,
-        EDIT
+        Get,
+        Remove,
+        Add,
+        Edit
     }
 }

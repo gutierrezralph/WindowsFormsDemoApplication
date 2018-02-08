@@ -35,9 +35,9 @@ namespace Task
             {
                 return await _context.SaveChangesAsync();
             }
-            catch (Exception e)
+            catch
             {
-
+                _context.Dispose();
                return 0;
             }
         }

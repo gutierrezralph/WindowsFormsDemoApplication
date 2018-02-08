@@ -10,7 +10,9 @@ namespace Task.DTO.Response
     public class ResponseResult
     {
         public List<object> Errors { get; set; }
-        public Result Result { get; set; }
+
+        [JsonProperty("Result")]
+        public Result Results { get; set; }
     }
 
     public class ResponseData
