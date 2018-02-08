@@ -26,9 +26,9 @@ namespace Task.Web.Api.Controllers
         [Route("employee/get")]
         public async Task<IHttpActionResult> GetAll()
         {
-            this.ModelState.Clear();
             try
             {
+                this.ModelState.Clear();
                 var result = await _employeeBusinessLayer.GetAllEmployee();
 
                 return Ok(new BasicResponse()
@@ -90,7 +90,7 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                var affectedRow = await _employeeBusinessLayer.InsertEmployee(employee);
+                await _employeeBusinessLayer.InsertEmployee(employee);
                 return Ok(new BasicResponse()
                 {
                     Status = true,
@@ -117,7 +117,7 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                int affectedRow = await _employeeBusinessLayer.UpdateEmployee(id,employee);
+                await _employeeBusinessLayer.UpdateEmployee(id,employee);
                 return Ok(new BasicResponse()
                 {
                     Status = true,
@@ -145,7 +145,7 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                int affectedRow = await _employeeBusinessLayer.DeleteEmployee(id);
+                await _employeeBusinessLayer.DeleteEmployee(id);
                 return Ok(new BasicResponse()
                 {
                     Status = true,
