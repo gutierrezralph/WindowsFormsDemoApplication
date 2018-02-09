@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Task.Windows.Forms.Helper
 {
-    public enum HttpRequestVerbEnum
+    public enum HttpRequestVerb
     {
-        Get,
-        Post,
-        Put,
-        Delete
+        GET,
+        POST,
+        PUT,
+        DELETE
     }
 }

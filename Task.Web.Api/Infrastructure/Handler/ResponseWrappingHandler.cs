@@ -13,6 +13,7 @@ namespace Task.Web.Api.Infrastructure.Handler
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var response = await base.SendAsync(request, cancellationToken);
+
             return BuildApiResponse(request, response);
         }
 
@@ -45,8 +46,9 @@ namespace Task.Web.Api.Infrastructure.Handler
                         var modelStateValues = deserializedErrorObject.ModelState.Select(kvp => string.Join(". ", kvp.Value));
 
                         for (int i = 0; i < modelStateValues.Count(); i++)
+                        {
                             modelStateErrors.Add(modelStateValues.ElementAt(i));
-
+                        }
                     }
                 }
             }
@@ -54,7 +56,10 @@ namespace Task.Web.Api.Infrastructure.Handler
             var newResponse = request.CreateResponse(response.StatusCode, new Response.ResponsePackage(content, modelStateErrors));
 
             foreach (var header in response.Headers) //Add back the response headers
+            {
                 newResponse.Headers.Add(header.Key, header.Value);
+            }
+
             return newResponse;
         }
 

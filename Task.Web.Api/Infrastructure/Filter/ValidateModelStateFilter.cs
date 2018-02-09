@@ -13,8 +13,8 @@ namespace Task.Web.Api.Infrastructure.Filter
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             if (!actionContext.ModelState.IsValid)
-                actionContext.Response = 
-                    actionContext.Request.CreateErrorResponse(System.Net.HttpStatusCode.BadRequest, actionContext.ModelState);
+                actionContext.Response = actionContext.
+                    Request.CreateErrorResponse(System.Net.HttpStatusCode.BadRequest, actionContext.ModelState);
         }
     }
 }

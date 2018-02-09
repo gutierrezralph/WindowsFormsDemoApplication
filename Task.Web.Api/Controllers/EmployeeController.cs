@@ -14,22 +14,18 @@ namespace Task.Web.Api.Controllers
     [RoutePrefix("api")]
     public class EmployeeController : ApiController
     {
-
-        private readonly IEmployeeBusinessLayer _employeeBusinessLayer;
-
-        public EmployeeController(IEmployeeBusinessLayer employeeBusinessLayer)
-        {
-            _employeeBusinessLayer = employeeBusinessLayer;
-        }
+        private readonly IEmployeeBusinessLayer empBL = new EmployeeBusinessLayer();
 
         [HttpGet]
         [Route("employee/get")]
         public async Task<IHttpActionResult> GetAll()
         {
+            if (ModelState.IsValid == false)
+                return BadRequest(ModelState);
+
             try
             {
-                this.ModelState.Clear();
-                var result = await _employeeBusinessLayer.GetAllEmployee();
+                var result = await empBL.GetAllEmployee();
 
                 return Ok(new BasicResponse()
                 {
@@ -60,7 +56,7 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                var result = await _employeeBusinessLayer.GetEmployeeById(id);
+                var result = await empBL.GetEmployeeById(id);
                        
                 return Ok(new BasicResponse()
                 {
@@ -90,12 +86,13 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                await _employeeBusinessLayer.InsertEmployee(employee);
-                return Ok(new BasicResponse()
-                {
-                    Status = true,
-                    Message = "AddEmployee",
-                });
+
+                    var affectedRow = await empBL.InsertEmployee(employee);
+                    return Ok(new BasicResponse()
+                    {
+                        Status = true,
+                        Message = "AddEmployee",
+                    });
             }
             catch (Exception e)
             {
@@ -117,7 +114,8 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                await _employeeBusinessLayer.UpdateEmployee(id,employee);
+                int affectedRow = await empBL.UpdateEmployee(id,employee);
+
                 return Ok(new BasicResponse()
                 {
                     Status = true,
@@ -145,7 +143,7 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                await _employeeBusinessLayer.DeleteEmployee(id);
+                int affectedRow = await empBL.DeleteEmployee(id);
                 return Ok(new BasicResponse()
                 {
                     Status = true,
@@ -157,7 +155,7 @@ namespace Task.Web.Api.Controllers
                 return Ok(new BasicResponse()
                 {
                     Status = false,
-                    Message = string.Format("RemoveEmployee ERROR {0}", e.Message),
+                    Message = "RemoveEmployee ERROR " + e.Message,
                     Exception = e
                 });
             }
