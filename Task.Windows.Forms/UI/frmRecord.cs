@@ -48,9 +48,7 @@ namespace Task.Windows.Forms.Forms
             try
             {
                 if (gridView.SelectedRowsCount > 0)
-                {
                     gridView.ShowEditForm();
-                }
             }
             catch (Exception x)
             {
@@ -64,13 +62,14 @@ namespace Task.Windows.Forms.Forms
             {
                 if (gridView.SelectedRowsCount > 0)
                 {
-                    if (XtraMessageBox.Show("Are you sure to delete selected record?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                    if (XtraMessageBox.Show("Selected record will be deleted?", "", MessageBoxButtons.YesNo, MessageBoxIcon.Information) == DialogResult.Yes)
                     {
                         var selectedRecordForDeletion = GetRowSelectedData();
                         if (selectedRecordForDeletion.Id == 0 || selectedRecordForDeletion == null) return;
-                        var record = new clsEmployeeRecord();
-                        record.ServiceRequestedData(
-                            string.Format("{0}/{1}", UrlRoute.REMOVE.ToString(), selectedRecordForDeletion.Id), selectedRecordForDeletion, HttpRequestVerb.DELETE
+                        var record = new EmployeeRecord();
+                        record.ServiceRequest(
+                            string.Format("{0}/{1}", EmployeeUrlRoute.Remove.ToString(), selectedRecordForDeletion.Id), 
+                            selectedRecordForDeletion, HttpRequestMethod.Delete
                             );
                         gridView.DeleteSelectedRows();
                     }
@@ -86,20 +85,17 @@ namespace Task.Windows.Forms.Forms
         {
             try
             {            
-                var IsCanel = EditFormCancelButtonWasClicked(sender);
-                if (IsCanel) return;
-                var data = GetRowSelectedData();
-                if(!string.IsNullOrWhiteSpace(data.FirstName) && !string.IsNullOrWhiteSpace(data.LastName))
+                var isFromCancelButton = EditFormCancelButtonWasClicked(sender);
+                if (isFromCancelButton) return;
+                var selectedData = GetRowSelectedData();
+                if(!string.IsNullOrWhiteSpace(selectedData.FirstName) && !string.IsNullOrWhiteSpace(selectedData.LastName))
                 {
-                    CreateRequest(data);
+                    CreateServiceRequest(selectedData);
                     gridView.CloseEditForm();
                     RefreshDataGrid();
-                    XtraMessageBox.Show("Successfully saved.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
-                {
                     return;
-                }
             }
             catch (Exception x)
             {
@@ -116,9 +112,9 @@ namespace Task.Windows.Forms.Forms
 
         private BindingList<ResponseData> GridDataSource()
         {
-            var record = new clsEmployeeRecord();
-            var data = record.GetEmployeeData();
-            return data;
+            var employeeRecord = new EmployeeRecord();
+            var employeeData = employeeRecord.GetEmployeeData();
+            return employeeData;
         }
 
         private void OnShowingPopupEditForm(object sender, DevExpress.XtraGrid.Views.Grid.ShowingPopupEditFormEventArgs e)
@@ -126,24 +122,20 @@ namespace Task.Windows.Forms.Forms
             foreach (Control control in e.EditForm.Controls)
             {
                 if (!(control is EditFormContainer))
-                {
                     continue;
-                }
                 foreach (Control nestedControl in control.Controls)
                 {
                     if (!(nestedControl is PanelControl))
-                    {
                         continue;
-                    }
                     foreach (Control button in nestedControl.Controls)
                     {
                         if (!(button is SimpleButton))
                         {
                             continue;
                         }
-                        var updateBotton = button as SimpleButton;
-                        updateBotton.Click -= OnClickEditFormUpdateButton;
-                        updateBotton.Click += OnClickEditFormUpdateButton;
+                        var updateButton = button as SimpleButton;
+                        updateButton.Click -= OnClickEditFormUpdateButton;
+                        updateButton.Click += OnClickEditFormUpdateButton;
                     }
                 }
             }
@@ -152,19 +144,25 @@ namespace Task.Windows.Forms.Forms
         private bool EditFormCancelButtonWasClicked(object sender)
         {
             var buttonType = sender.GetType().Name;
+
             // Check if the sender is cancel button from editForm
-            var IsCanel = buttonType.Equals("EditFormCancelButton", StringComparison.CurrentCultureIgnoreCase);
-            return IsCanel;
+            var isCanel = buttonType.Equals("EditFormCancelButton", StringComparison.CurrentCultureIgnoreCase);
+            return isCanel;
         }
 
-        private void CreateRequest(ResponseData data)
+        /// <summary>
+        /// Composing request
+        /// </summary>
+        /// <param name="responseData"></param>
+        private void CreateServiceRequest(ResponseData responseData)
         {
-            var record = new clsEmployeeRecord();
+            var record = new EmployeeRecord();
 
-            if(data.Id == 0)
-                record.ServiceRequestedData(UrlRoute.ADD.ToString(), data, HttpRequestVerb.POST);
+            if(responseData.Id == 0)
+                record.ServiceRequest(EmployeeUrlRoute.Add.ToString(), responseData, HttpRequestMethod.Post);
             else
-                 record.ServiceRequestedData(string.Format("{0}/{1}", UrlRoute.EDIT.ToString(), data.Id), data, HttpRequestVerb.PUT);
+                 record.ServiceRequest(
+                     string.Format("{0}/{1}", EmployeeUrlRoute.Edit.ToString(), responseData.Id), responseData, HttpRequestMethod.Put);
         }
 
         private ResponseData GetRowSelectedData()
@@ -183,12 +181,11 @@ namespace Task.Windows.Forms.Forms
                 return;           
 
             var inputValue = Convert.ToString(e.Value);
-            var inputValueArray = inputValue.ToCharArray();
 
             if (!(inputValue.All(c => Char.IsLetter(c) || c == ' ')))
             {
                 e.ErrorText = "The text entered contains invalid character.";
-                e.Valid = false;                
+                e.Valid = false;
             }
 
             if (inputValue.Length > 50)
@@ -202,7 +199,6 @@ namespace Task.Windows.Forms.Forms
                 e.ErrorText = "Zero.";
                 e.Valid = false;
             }
-
         }
     }
 }

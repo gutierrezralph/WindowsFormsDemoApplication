@@ -14,55 +14,22 @@ namespace Task.Web.Api.Controllers
     [RoutePrefix("api")]
     public class EmployeeController : ApiController
     {
-        private readonly IEmployeeBusinessLayer empBL = new EmployeeBusinessLayer();
+        private readonly IEmployeeBusinessLayer _employeeBusinessLayer = new EmployeeBusinessLayer();
 
         [HttpGet]
-        [Route("employee/get")]
-        public async Task<IHttpActionResult> GetAll()
-        {
-            if (ModelState.IsValid == false)
-                return BadRequest(ModelState);
-
-            try
-            {
-                var result = await empBL.GetAllEmployee();
-
-                return Ok(new BasicResponse()
-                {
-                    Status = true,
-                    Message = "GetAllPerson",
-                    Response = result.ToList()
-                });
-
-            }
-            catch (Exception e)
-            {
-                return Ok(new BasicResponse()
-                {
-                    Status = false,
-                    Message = "GetAllPerson ERROR " + e.Message,
-                    Exception = e
-                });
-            }
-
-        }
-
-        
-        [HttpGet]
-        [ValidateModelStateFilter]
-        [Route("employee/get/{id}")]
-        public async Task<IHttpActionResult> GetEmployeeById(int id)
+        [Route("employee")]
+        public async Task<IHttpActionResult> GetAllEmployee()
         {
             try
             {
                 this.ModelState.Clear();
-                var result = await empBL.GetEmployeeById(id);
-                       
+                var result = await _employeeBusinessLayer.GetAllEmployee();
+
                 return Ok(new BasicResponse()
                 {
                     Status = true,
-                    Message = "GetEmployeeById",
-                    Response = result
+                    Message = "GetAllEmployee",
+                    Response = result.ToList()
                 });
             }
             catch (Exception e)
@@ -70,14 +37,13 @@ namespace Task.Web.Api.Controllers
                 return Ok(new BasicResponse()
                 {
                     Status = false,
-                    Message = "GetEmployeeById ERROR " + e.Message,
+                    Message = string.Format("GetAllEmployee ERROR {0}", e.Message),
                     Exception = e
                 });
             }
 
         }
-
-       
+             
         [HttpPost]
         [ValidateModelStateFilter]
         [Route("employee/add")]
@@ -86,20 +52,19 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-
-                    var affectedRow = await empBL.InsertEmployee(employee);
-                    return Ok(new BasicResponse()
-                    {
-                        Status = true,
-                        Message = "AddEmployee",
-                    });
+                await _employeeBusinessLayer.InsertEmployee(employee);
+                return Ok(new BasicResponse()
+                {
+                    Status = true,
+                    Message = "AddEmployee",
+                });
             }
             catch (Exception e)
             {
                 return Ok(new BasicResponse()
                 {
                     Status = false,
-                    Message = "AddEmployee ERROR " + e.Message,
+                    Message = string.Format("AddEmployee ERROR {0}", e.Message),
                     Exception = e
                 });
             }
@@ -114,21 +79,20 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                int affectedRow = await empBL.UpdateEmployee(id,employee);
+                 await _employeeBusinessLayer.UpdateEmployee(id,employee);
 
                 return Ok(new BasicResponse()
                 {
                     Status = true,
                     Message = "EditEmployee",
                 });
-
             }
             catch (Exception e)
             {
                 return Ok(new BasicResponse()
                 {
                     Status = false,
-                    Message = "EditEmployee ERROR " + e.Message,
+                    Message = string.Format("EditEmployee ERROR {0}", e.Message),
                     Exception = e
                 });
             }
@@ -143,7 +107,7 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                int affectedRow = await empBL.DeleteEmployee(id);
+                int affectedRow = await _employeeBusinessLayer.DeleteEmployee(id);
                 return Ok(new BasicResponse()
                 {
                     Status = true,
@@ -155,7 +119,7 @@ namespace Task.Web.Api.Controllers
                 return Ok(new BasicResponse()
                 {
                     Status = false,
-                    Message = "RemoveEmployee ERROR " + e.Message,
+                    Message = string.Format("RemoveEmployee ERROR {0}", e.Message),
                     Exception = e
                 });
             }

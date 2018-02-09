@@ -15,7 +15,6 @@ namespace Task
     {
         public IEmployeeRepository EmployeeRepo { get; set; }
 
-
         private readonly TaskContext _context;
 
         public UnitOfWork(TaskContext context)
@@ -31,15 +30,7 @@ namespace Task
 
         public async Task<int> SaveChangesAsync()
         {
-            try
-            {
-                return await _context.SaveChangesAsync();
-            }
-            catch (Exception e)
-            {
-
-               return 0;
-            }
+            return await _context.SaveChangesAsync();
         }
     }
 }

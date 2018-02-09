@@ -1,10 +1,6 @@
 ﻿using System;
-using AutoMapper;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Awaitable = System.Threading.Tasks;
 using System.Windows.Forms;
 using Task.DTO.Request;
 using Task.DTO.Response;
@@ -14,7 +10,7 @@ using DevExpress.XtraEditors;
 
 namespace Task.Windows.Forms.Classes
 {
-    public class clsEmployeeRecord
+    public class EmployeeRecord
     {
         public BindingList<ResponseData> GetEmployeeData()
         {
@@ -22,15 +18,13 @@ namespace Task.Windows.Forms.Classes
             var data = new BindingList<ResponseData>();
             try
             {
-                var getResult = System.Threading.Tasks.Task.Run(() => service.GetAsync(UrlRoute.GET.ToString()));
+                var getResult = Awaitable.Task.Run(() => service.GetAsync());
                 getResult.Wait();
                 foreach (var item in getResult.Result.Result.ResponseData)
-                {
                     data.Add(item);
-                }
                 return data;
             }
-            catch (Exception e)
+            catch
             {
                 XtraMessageBox.Show("Error while sending request","Error",MessageBoxButtons.OK,MessageBoxIcon.Error);
                 return null;
@@ -40,22 +34,21 @@ namespace Task.Windows.Forms.Classes
         /// <summary>
         /// Composing request to the WebAPI
         /// </summary>
-        /// <param name="route"> 
-        /// URL Route such as Get , Edit/{id} , Remove/{id} , Add </param>
-        /// <param name="data"> Request data </param>
-        /// <param name="verb"> POST, GET, PUT, DELETE </param>
-        /// <returns> Return TRUE if Success else False </returns>
-        public bool ServiceRequestedData(string route, ResponseData data, HttpRequestVerb verb)
+        /// <param name="uriRoute">Employee API route</param>
+        /// <param name="responseData"> Response data that will be map to request data format </param>
+        /// <param name="method"> POST, GET, PUT, DELETE </param>
+        /// <returns>True if success else False </returns>
+        public bool ServiceRequest(string urlRoute, ResponseData responseData, HttpRequestMethod method)
         {
-            var mappedRequest = AutoMapper.Mapper.Map<EmployeeRequest>(data);
+            var mappedRequest = AutoMapper.Mapper.Map<EmployeeRequest>(responseData);
             var service = new EmployeeService();
             try
             {
-                var getResult = System.Threading.Tasks.Task.Run(() => service.CreateServiceRequestAsync(route, mappedRequest, verb));
+                var getResult = Awaitable.Task.Run(() => service.SendingRequestAsync(urlRoute, mappedRequest, method));
                 getResult.Wait();
                 return true;
             }
-            catch (Exception e)
+            catch
             {
                 XtraMessageBox.Show("Error while sending request", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
