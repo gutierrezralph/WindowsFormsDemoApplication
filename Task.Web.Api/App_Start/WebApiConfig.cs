@@ -4,7 +4,6 @@ using Task.Web.Api.Infrastructure.Filter;
 using Microsoft.AspNet.WebApi.Extensions.Compression.Server;
 using System.Net.Http.Extensions.Compression.Core.Compressors;
 using Task.Web.Api.Infrastructure.Handler;
-using Task.Web.Api.Module;
 using Ninject;
 using Task.BusinessLayer.Interface;
 using Task.BusinessLayer.Implementation;

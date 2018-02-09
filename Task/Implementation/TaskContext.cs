@@ -11,6 +11,10 @@ namespace Task.Implementation
 {
     public class TaskContext : DbContext
     {
+        public TaskContext() : base("AIMM")
+        {
+
+        }
         public DbSet<Employee> Employees { get; set; }
         public new DbSet<T> Set<T>() where T : class
         {

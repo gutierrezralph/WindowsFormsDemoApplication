@@ -62,9 +62,9 @@
     <Compile Include="Implementation\Repository\EmployeeRepository.cs" />
     <Compile Include="Implementation\Repository\Repository.cs" />
     <Compile Include="ITaskContext.cs" />
-    <Compile Include="Migrations\201802031513336_AddEmployeeTableClass.cs" />
-    <Compile Include="Migrations\201802031513336_AddEmployeeTableClass.Designer.cs">
-      <DependentUpon>201802031513336_AddEmployeeTableClass.cs</DependentUpon>
+    <Compile Include="Migrations\201802090829166_AddEmployeeTable.cs" />
+    <Compile Include="Migrations\201802090829166_AddEmployeeTable.Designer.cs">
+      <DependentUpon>201802090829166_AddEmployeeTable.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Persistence\EntityConfigurations\EmployeeConfiguration.cs" />
@@ -77,8 +77,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\201802031513336_AddEmployeeTableClass.resx">
-      <DependentUpon>201802031513336_AddEmployeeTableClass.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\201802090829166_AddEmployeeTable.resx">
+      <DependentUpon>201802090829166_AddEmployeeTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
