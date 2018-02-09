@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using Awaitable = System.Threading.Tasks;
 using Task.BusinessLayer.Interface;
 using Task.Core;
 using Task.Core.Domain;
+using Task.Core.Repositories;
 using Task.DTO.Request;
 using Task.Implementation;
 
@@ -16,43 +17,45 @@ namespace Task.BusinessLayer.Implementation
     {
         private TaskContext _context { get; set; }
 
-        private IUnitOfWork _unitOfWork = new UnitOfWork(new TaskContext());
+        private readonly IEmployeeRepository _employeeRepository;
 
-        public async Task<IEnumerable<Employee>> GetAllEmployee()
+        public EmployeeBusinessLayer(IEmployeeRepository employeeRepository)
         {
-            return await _unitOfWork.EmployeeRepo.GetAllAsync();
+            _employeeRepository = employeeRepository;
         }
 
-        public async Task<Employee> GetEmployeeById(int id)
+        public async Awaitable.Task<IEnumerable<Employee>> GetAllEmployee()
         {
-            return await _unitOfWork.EmployeeRepo.GetAsync(id);
+            return await _employeeRepository.GetAllAsync();
         }
 
-        public async Task<int> InsertEmployee(EmployeeRequest emp)
+        public async Awaitable.Task<Employee> GetEmployeeById(int id)
+        {
+            return await _employeeRepository.GetAsync(id);
+        }
+
+        public async Awaitable.Task InsertEmployee(EmployeeRequest emp)
         {
             var employee = Mapper.Map<Employee>(emp);
-            _unitOfWork.EmployeeRepo.Add(employee);
-            return await _unitOfWork.SaveChangesAsync();
+            await _employeeRepository.Add(employee);
         }
 
-        public async Task<int> UpdateEmployee(int id, EmployeeRequest emp)
+        public async Awaitable.Task UpdateEmployee(int id, EmployeeRequest emp)
         {
-            var existingInfo = await _unitOfWork.EmployeeRepo.GetAsync(id);
+            var existingInfo = await _employeeRepository.GetAsync(id);
             var newInfo = Mapper.Map<Employee>(emp);
 
             var employee = Mapper.Map(newInfo, existingInfo);
             employee.Id = existingInfo.Id;
 
-            _unitOfWork.EmployeeRepo.SaveOrUpdate(employee);
-            return await _unitOfWork.SaveChangesAsync();
+            await _employeeRepository.SaveOrUpdate(employee);
         }
 
-        public async Task<int> DeleteEmployee(int id)
+        public async Awaitable.Task DeleteEmployee(int id)
         {
-            var existingInfo = await _unitOfWork.EmployeeRepo.GetAsync(id);
+            var existingInfo = await _employeeRepository.GetAsync(id);
             var employee = Mapper.Map<Employee>(existingInfo);
-            _unitOfWork.EmployeeRepo.Remove(employee);
-            return await _unitOfWork.SaveChangesAsync();
+            await _employeeRepository .DeleteOnSubmit(employee);
         }
     }
 }

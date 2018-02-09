@@ -14,7 +14,11 @@ namespace Task.Web.Api.Controllers
     [RoutePrefix("api")]
     public class EmployeeController : ApiController
     {
-        private readonly IEmployeeBusinessLayer _employeeBusinessLayer = new EmployeeBusinessLayer();
+        private readonly IEmployeeBusinessLayer _employeeBusinessLayer;
+        public EmployeeController(IEmployeeBusinessLayer employeeBusinessLayer)
+        {
+            _employeeBusinessLayer = employeeBusinessLayer;
+        }
 
         [HttpGet]
         [Route("employee")]
@@ -24,12 +28,11 @@ namespace Task.Web.Api.Controllers
             {
                 this.ModelState.Clear();
                 var result = await _employeeBusinessLayer.GetAllEmployee();
-
                 return Ok(new BasicResponse()
                 {
                     Status = true,
-                    Message = "GetAllEmployee",
-                    Response = result.ToList()
+                    Message = nameof(this.GetAllEmployee),
+                    Response = result
                 });
             }
             catch (Exception e)
@@ -37,7 +40,7 @@ namespace Task.Web.Api.Controllers
                 return Ok(new BasicResponse()
                 {
                     Status = false,
-                    Message = string.Format("GetAllEmployee ERROR {0}", e.Message),
+                    Message = string.Format("{0} ERROR {1}", nameof(this.GetAllEmployee), e.Message),
                     Exception = e
                 });
             }
@@ -56,7 +59,7 @@ namespace Task.Web.Api.Controllers
                 return Ok(new BasicResponse()
                 {
                     Status = true,
-                    Message = "AddEmployee",
+                    Message = nameof(this.AddEmployee),
                 });
             }
             catch (Exception e)
@@ -64,7 +67,7 @@ namespace Task.Web.Api.Controllers
                 return Ok(new BasicResponse()
                 {
                     Status = false,
-                    Message = string.Format("AddEmployee ERROR {0}", e.Message),
+                    Message = string.Format("{0} ERROR {1}", nameof(this.AddEmployee), e.Message),
                     Exception = e
                 });
             }
@@ -84,7 +87,7 @@ namespace Task.Web.Api.Controllers
                 return Ok(new BasicResponse()
                 {
                     Status = true,
-                    Message = "EditEmployee",
+                    Message = nameof(this.EditEmployee),
                 });
             }
             catch (Exception e)
@@ -92,7 +95,7 @@ namespace Task.Web.Api.Controllers
                 return Ok(new BasicResponse()
                 {
                     Status = false,
-                    Message = string.Format("EditEmployee ERROR {0}", e.Message),
+                    Message = string.Format("{0} ERROR {1}", nameof(this.EditEmployee), e.Message),
                     Exception = e
                 });
             }
@@ -107,11 +110,11 @@ namespace Task.Web.Api.Controllers
             try
             {
                 this.ModelState.Clear();
-                int affectedRow = await _employeeBusinessLayer.DeleteEmployee(id);
+                await _employeeBusinessLayer.DeleteEmployee(id);
                 return Ok(new BasicResponse()
                 {
                     Status = true,
-                    Message = "RemoveEmployee"
+                    Message = nameof(this.RemoveEmployee)
                 });
             }
             catch (Exception e)
@@ -119,7 +122,7 @@ namespace Task.Web.Api.Controllers
                 return Ok(new BasicResponse()
                 {
                     Status = false,
-                    Message = string.Format("RemoveEmployee ERROR {0}", e.Message),
+                    Message = string.Format("{0} ERROR {1}", nameof(this.RemoveEmployee), e.Message),
                     Exception = e
                 });
             }

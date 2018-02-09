@@ -4,9 +4,14 @@ using Task.Web.Api.Infrastructure.Filter;
 using Microsoft.AspNet.WebApi.Extensions.Compression.Server;
 using System.Net.Http.Extensions.Compression.Core.Compressors;
 using Task.Web.Api.Infrastructure.Handler;
-using Ninject;
 using Task.BusinessLayer.Interface;
 using Task.BusinessLayer.Implementation;
+using Task.Implementation;
+using Task.Core.Repositories;
+using Task.Implementation.Repository;
+using Unity;
+using Unity.Lifetime;
+using Task.Web.Api.Resolver;
 
 namespace Task.Web.Api
 {
@@ -32,8 +37,10 @@ namespace Task.Web.Api
             //Initialeze model valition provider
             FluentValidationModelValidatorProvider.Configure(config);
 
-            /// Initialize Kernel
-            InitializedKernelForNinject();
+            var container = new UnityContainer();
+            container.RegisterType<IEmployeeBusinessLayer, EmployeeBusinessLayer>(new HierarchicalLifetimeManager());
+            container.RegisterType<IEmployeeRepository, EmployeeRepository>(new HierarchicalLifetimeManager());
+            config.DependencyResolver = new UnityResolver(container);
 
             // Web API routes
             config.MapHttpAttributeRoutes();
@@ -43,15 +50,6 @@ namespace Task.Web.Api
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
-        }
-
-        /// <summary>
-        /// Initialize Kernel
-        /// </summary>
-        private static void InitializedKernelForNinject()
-        {
-            IKernel kernel = new StandardKernel();
-            kernel.Bind<IEmployeeBusinessLayer>().To<EmployeeBusinessLayer>();
         }
     }
 }

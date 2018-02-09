@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using System.Threading.Tasks;
+using Awaitable = System.Threading.Tasks;
 
 namespace Task.Core.Repositories
 {
@@ -13,12 +13,10 @@ namespace Task.Core.Repositories
     }
     public interface IRepository <TEntity> : IRepository where TEntity : class
     {
-        Task<TEntity> GetAsync(int id);
-        Task<IEnumerable<TEntity>> GetAllAsync();
-        void Add(TEntity entity);
-        void Remove(TEntity entity);
-        void SaveOrUpdate(TEntity entity);
-        Task<int> SaveChangesAsync();
-        void DeleteOnSubmit(TEntity entity);
+        Awaitable.Task Add(TEntity entity);
+        Awaitable.Task<TEntity> GetAsync(int id);
+        Awaitable.Task<IEnumerable<TEntity>> GetAllAsync();
+        Awaitable.Task SaveOrUpdate(TEntity entity);
+        Awaitable.Task DeleteOnSubmit(TEntity entity);
     }
 }

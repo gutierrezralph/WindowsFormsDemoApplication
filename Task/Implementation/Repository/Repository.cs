@@ -16,20 +16,15 @@ namespace Task.Implementation.Repository
 
         protected readonly TaskContext _context;
         protected readonly DbSet<TEntity> _entities;
-        
         public Repository(TaskContext context)
         {
             _context = context;
             _entities = context.Set<TEntity>();
         }
-        public void Add(TEntity entity)
+        public async System.Threading.Tasks.Task Add(TEntity entity)
         {
             _context.Set<TEntity>().Add(entity);
-        }
-
-        public void AddOrUpdate(TEntity entity)
-        {
-            _context.Set<TEntity>().AddOrUpdate(entity);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<TEntity> GetAsync(int id)
@@ -42,24 +37,16 @@ namespace Task.Implementation.Repository
             return await _context.Set<TEntity>().ToListAsync();
         }
 
-        public void Remove(TEntity entity)
+        public async System.Threading.Tasks.Task SaveOrUpdate(TEntity entity)
+        {
+            _context.Set<TEntity>().AddOrUpdate(entity);
+            await _context.SaveChangesAsync();
+        }
+
+        public async System.Threading.Tasks.Task DeleteOnSubmit(TEntity entity)
         {
             _context.Set<TEntity>().Remove(entity);
-        }
-
-        public async Task<int> SaveChangesAsync()
-        {
-          return await _context.SaveChangesAsync();
-        }        
-
-        public void SaveOrUpdate(TEntity entity)
-        {
-            AddOrUpdate(entity);
-        }
-
-        public void DeleteOnSubmit(TEntity entity)
-        {
-            Remove(entity);
+            await _context.SaveChangesAsync();
         }
     }
 }

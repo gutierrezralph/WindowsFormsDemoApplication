@@ -11,9 +11,10 @@ namespace Task.Implementation.Repository
 {
     public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
     {
+        private readonly TaskContext _taskContext;
         public EmployeeRepository(TaskContext context) : base (context)
         {
-
+            _taskContext = context;
         }
     }
 }
